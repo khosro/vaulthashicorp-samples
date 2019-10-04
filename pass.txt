@@ -1,0 +1,203 @@
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64>vault operator init
+Unseal Key 1: t9CKkzHiziJhnpR13Q8+LAKODUuXNFsfvfWCUvbrRT2X
+Unseal Key 2: 4L7P1CkbruPGrGNdmkfEY62AznXePdqA25B/Q7pMJdB0
+Unseal Key 3: 36I7E7arVd75TF252ddLswsD9Ld2ors0fh37uZWqJopE
+Unseal Key 4: 6etjdHYkoILWlw1oliffC64L5pDTcevjNizWgyG/41bp
+Unseal Key 5: vnWdSXprdGIdHEJg4nhDspLXmMLBrHWRdsA0Lr0qsOFs
+
+Initial Root Token: s.6DYy3mX1U5nvrPItdoLsRWaH
+
+Vault initialized with 5 key shares and a key threshold of 3. Please securely
+distribute the key shares printed above. When the Vault is re-sealed,
+restarted, or stopped, you must supply at least 3 of these keys to unseal it
+before it can start servicing requests.
+
+Vault does not store the generated master key. Without at least 3 key to
+reconstruct the master key, Vault will remain permanently sealed!
+
+It is possible to generate new unseal keys, provided you have a quorum of
+existing unseal keys shares. See "vault operator rekey" for more information.
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64>vault operator unseal
+Unseal Key (will be hidden):
+Key                Value
+---                -----
+Seal Type          shamir
+Initialized        true
+Sealed             true
+Total Shares       5
+Threshold          3
+Unseal Progress    1/3
+Unseal Nonce       ad082cec-988d-21ed-750c-1a08e481f67a
+Version            1.2.3
+HA Enabled         false
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64>vault operator unseal
+Unseal Key (will be hidden):
+Key                Value
+---                -----
+Seal Type          shamir
+Initialized        true
+Sealed             true
+Total Shares       5
+Threshold          3
+Unseal Progress    2/3
+Unseal Nonce       ad082cec-988d-21ed-750c-1a08e481f67a
+Version            1.2.3
+HA Enabled         false
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64>vault operator unseal
+Unseal Key (will be hidden):
+Key             Value
+---             -----
+Seal Type       shamir
+Initialized     true
+Sealed          false
+Total Shares    5
+Threshold       3
+Version         1.2.3
+Cluster Name    vault-cluster-708c496e
+Cluster ID      22432aec-d855-75bb-a45c-b686096cbaa1
+HA Enabled      false
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64>
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64> vault read database/creds/my-role
+Key                Value
+---                -----
+lease_id           database/creds/my-role/c2uKPRJfbdMrb4xoGirJNanb
+lease_duration     1h
+lease_renewable    true
+password           A1a-z36SuaW1Z5yfqegI
+username           v-root-my-role-YqvTjt65ZqIcLeYvuXFL-1570137971
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64> vault read database/creds/my-role
+Key                Value
+---                -----
+lease_id           database/creds/my-role/jVe7C6QHGw5vHIFlq3PR4bgA
+lease_duration     1h
+lease_renewable    true
+password           A1a-0oosM2i1fFrkwlcW
+username           v-root-my-role-f1BvHewOV19Z9NTcMiAN-1570137985
+
+D:\Software-Work\Programming\vault_1.2.3_windows_amd64> vault read database/creds/my-role
+Key                Value
+---                -----
+lease_id           database/creds/my-role/AzYrXstFPbs6wEDv3FfbK1VR
+lease_duration     1h
+lease_renewable    true
+password           A1a-E3pAjkdSGhcQxSBU
+username           v-root-my-role-2iXE2Sjj6iQavdS5jgwL-1570137993
+
+###############################################
+
+  create database vault ;
+  create user vaultuser with encrypted password '123456';
+  grant all privileges on database vault  vaultuser;
+ 
+creating tables accoding to https://www.vaultproject.io/docs/configuration/storage/postgresql.html
+
+CREATE TABLE vault_kv_store (
+  parent_path TEXT COLLATE "C" NOT NULL,
+  path        TEXT COLLATE "C",
+  key         TEXT COLLATE "C",
+  value       BYTEA,
+  CONSTRAINT pkey PRIMARY KEY (path, key)
+);
+
+CREATE INDEX parent_path_idx ON vault_kv_store (parent_path);
+CREATE TABLE vault_ha_locks (
+  ha_key                                      TEXT COLLATE "C" NOT NULL,
+  ha_identity                                 TEXT COLLATE "C" NOT NULL,          
+  ha_value                                    TEXT COLLATE "C",  
+  valid_until                                 TIMESTAMP WITH TIME ZONE NOT NULL,
+  CONSTRAINT ha_key PRIMARY KEY (ha_key)
+);
+
+GRANT ALL ON TABLE public.vault_ha_locks TO vaultuser WITH GRANT OPTION;
+GRANT ALL ON TABLE public.vault_kv_store TO vaultuser WITH GRANT OPTION;
+
+ALTER ROLE vaultuser	CREATEROLE;
+
+
+REVOKE ALL ON TABLE public.vault_ha_locks FROM "v-root-my-role-XR56MkEuCktf1Yzf9Qun-1570136841";
+REVOKE ALL ON TABLE public.vault_ha_locks FROM "v-root-my-role-OzMtikoSsy70SMVdLFr9-1570136584";
+REVOKE ALL ON TABLE public.vault_ha_locks FROM "v-root-my-role-K340PF9qb85758rlw3l7-1570136964";
+
+ 
+
+----------
+set VAULT_ADDR=http://127.0.0.1:8200
+
+vault operator init
+
+vault operator unseal
+
+set VAULT_TOKEN=s.6DYy3mX1U5nvrPItdoLsRWaH
+ 
+vault login %VAULT_TOKEN%
+
+
+-------------
+
+vault secrets enable database
+
+vault write database/config/vault   plugin_name=postgresql-database-plugin     allowed_roles="my-role"     connection_url="postgresql://{{username}}:{{password}}@localhost:5432/vault?sslmode=disable"     username="vaultuser"     password="123456"
+
+ 
+ 
+  vault write database/roles/my-role      db_name=vault     creation_statements="CREATE ROLE  \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';         GRANT SELECT ON ALL TABLES IN SCHEMA public TO \"{{name}}\";"      default_ttl="1h"      max_ttl="24h"
+ 
+ 
+ vault read database/creds/my-role
+ 
+ 
+   curl     --header "X-Vault-Token: %VAULT_TOKEN%"     http://127.0.0.1:8200/v1/database/creds/my-role
+ {"request_id":"e4a1e83f-a8d1-e5ff-d000-d2441ddedd9a","lease_id":"database/creds/my-role/bo1SRQUdCMEgX71iWK1aCQox","renewable":true,"lease_duration":3600,"data":{"password":"A1a-ZXaZGffFXsEAyRgU","username":"v-root-my-role-OzMtikoSsy70SMVdLFr9-1570136584"},"wrap_info":null,"warnings":null,"auth":null}
+  
+ 
+    
+  curl      --header "X-Vault-Token: %VAULT_TOKEN%"      --request GET     http://127.0.0.1:8200/v1/database/config/vault
+  
+  curl      --header "X-Vault-Token: %VAULT_TOKEN%"       --request LIST      http://127.0.0.1:8200/v1/database/config
+  
+ 
+ -------------------
+ 
+ vault auth enable approle
+
+ vault write auth/approle/role/my-role     secret_id_ttl=10m     token_num_uses=10    token_ttl=20m     token_max_ttl=30m     secret_id_num_uses=40
+ 
+  vault write -f auth/approle/role/my-role/secret-id
+  
+  
+  
+$$$$$$$$$$$$$ Mian Section
+  
+curl --header "X-Vault-Token: %VAULT_TOKEN%" --request POST --data @data-approle-myrole.hcl     http://127.0.0.1:8200/v1/auth/approle/role/my-role
+
+  vault read auth/approle/role/my-role/role-id
+ 
+  
+curl     --header "X-Vault-Token: %VAULT_TOKEN%"     http://127.0.0.1:8200/v1/auth/approle/role/my-role
+  
+  curl     --request POST     --data @payload.json     http://127.0.0.1:8200/v1/auth/approle/login
+  
+$$$$$$$$$$$$$ Mian Section
+
+  
+  
+  
+curl --header "X-Vault-Token: %VAULT_TOKEN%" --request POST --data '{"policies": "my-policy"}'    http://127.0.0.1:8200/v1/auth/approle/role/my-role
+
+    curl  --header "X-Vault-Token: %VAULT_TOKEN%"      http://127.0.0.1:8200/v1/auth/approle/role/my-role/role-id
+  
+   curl     --header "X-Vault-Token: %VAULT_TOKEN%"     --request POST     --data @payload.json  http://127.0.0.1:8200/v1/auth/approle/role/my-role/secret-id
+   
+   curl --header "X-Vault-Token: %VAULT_TOKEN%"     --request POST       http://127.0.0.1:8200/v1/auth/approle/role/my-role/secret-id
+  
+ ------------
+ 
+ vault policy list
+ vault policy read my-policy
+
+vault policy write my-policy my-policy.hcl
