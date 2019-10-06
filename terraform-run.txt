@@ -1,0 +1,24 @@
+ 
+
+  create user terraformuser with encrypted password '123456';
+    ALTER ROLE terraformuser 	CREATEDB;
+
+  #create database terraform ; does not need
+  #grant all privileges on database terraform to terraformuser;  does not need
+  
+  
+  
+  terraform init
+  terraform apply
+  terraform show
+  
+  
+  Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.

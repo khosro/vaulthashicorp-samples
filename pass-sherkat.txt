@@ -1,0 +1,64 @@
+Unseal Key 1: BZnRePdjZv2cgbTPWLacW0zDPit0tgup4A8tvKeUjeag
+Unseal Key 2: ayl8q1XGqrWsf+DTi3AkGMkiMTEnkeqfFCYVwEdxHGXg
+Unseal Key 3: XRozqNnZTyGXF4UOcIrXVYcDhabp71o05tHkqw6veDFS
+Unseal Key 4: O/e+vpFyygqr8tLdv4661vsMzExs0tGAmDMX6HOjgzrx
+Unseal Key 5: air4jBd80q2YIaNCy3/djQiE9gBLHLTV2LVYiYAhLnD7
+
+Initial Root Token: s.spNbJu1LVnBYGt68uTpPKrhz
+
+Vault initialized with 5 key shares and a key threshold of 3. Please securely
+distribute the key shares printed above. When the Vault is re-sealed,
+restarted, or stopped, you must supply at least 3 of these keys to unseal it
+before it can start servicing requests.
+
+Vault does not store the generated master key. Without at least 3 key to
+reconstruct the master key, Vault will remain permanently sealed!
+
+It is possible to generate new unseal keys, provided you have a quorum of
+existing unseal keys shares. See "vault operator rekey" for more information.
+
+
+C:\Users\kh.asghari>vault operator unseal
+Unseal Key (will be hidden):
+Key                Value
+---                -----
+Seal Type          shamir
+Initialized        true
+Sealed             true
+Total Shares       5
+Threshold          3
+Unseal Progress    1/3
+Unseal Nonce       dcc02c23-1c57-8b00-4c93-19c3dae1f180
+Version            1.2.3
+HA Enabled         false
+
+C:\Users\kh.asghari>vault operator unseal
+Unseal Key (will be hidden):
+Key                Value
+---                -----
+Seal Type          shamir
+Initialized        true
+Sealed             true
+Total Shares       5
+Threshold          3
+Unseal Progress    2/3
+Unseal Nonce       dcc02c23-1c57-8b00-4c93-19c3dae1f180
+Version            1.2.3
+HA Enabled         false
+
+C:\Users\kh.asghari>vault operator unseal
+Unseal Key (will be hidden):
+Key             Value
+---             -----
+Seal Type       shamir
+Initialized     true
+Sealed          false
+Total Shares    5
+Threshold       3
+Version         1.2.3
+Cluster Name    vault-cluster-c6f49020
+Cluster ID      cfcf1a44-806e-1a3e-d29d-ed8d9734a219
+HA Enabled      false
+
+C:\Users\kh.asghari>
+
