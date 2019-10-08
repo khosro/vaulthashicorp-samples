@@ -37,10 +37,11 @@ REVOKE ALL ON TABLE public.vault_ha_locks FROM "v-root-my-role-K340PF9qb85758rlw
  -----------
  
  ----------
+ 
 set VAULT_ADDR=http://127.0.0.1:8200
 
 
- vault server -config=config.hcl
+vault server -config=config.hcl
  
 vault operator init
 
@@ -113,9 +114,9 @@ curl --header "X-Vault-Token: %VAULT_TOKEN%" --request POST --data '{"policies":
    curl --header "X-Vault-Token: %VAULT_TOKEN%"     --request POST       http://127.0.0.1:8200/v1/auth/approle/role/my-role/secret-id
   
  ------------
- vault secrets enable -version=1 kv
+vault secrets enable -path=secret  -version=1 kv
 
- vault kv put kv/my-secret my-value=s3cr3t
+ vault kv put secret/my-secret my-value=s3cr3t
  
  ---------------------
  
