@@ -8,6 +8,5 @@
     "my-policy"
   ],
   "period": 0,
-  "bind_secret_id": true,
- "token_bound_cidrs": ["127.0.0.1"]
+  "bind_secret_id": true
 }
